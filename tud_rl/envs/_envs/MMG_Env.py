@@ -570,10 +570,13 @@ class MMG_Env(gym.Env):
         Returns new_state, r, done, {}."""
 
         # perform control action
-        self.OS._control(a)
+        self.OS._control(a[0])
 
         # update agent dynamics
         self.OS._upd_dynamics()
+
+        # 新增
+        [TS._control(a_i) for i, TS in enumerate(self.TSs)]
 
         # update environmental dynamics, e.g., other vessels
         [TS._upd_dynamics() for TS in self.TSs]
