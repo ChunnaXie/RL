@@ -493,6 +493,7 @@ class MMG_Env(gym.Env):
 
             if ED_OS_TS <= self.sight:
 
+                ts_internal_state = TS.get_state() #获取TS的内部状态
                 # euclidean distance
                 D = get_ship_domain(A=self.OS.ship_domain_A, B=self.OS.ship_domain_B, C=self.OS.ship_domain_C, D=self.OS.ship_domain_D,\
                      OS=self.OS, TS=TS)
@@ -516,34 +517,45 @@ class MMG_Env(gym.Env):
                 # store it
                 state_TSs.append([ED_OS_TS_norm, bng_rel_TS, C_TS, V_TS, sigma_TS, CR])
 
-        # no TS is in sight: pad a 'ghost ship' to avoid confusion for the agents
-        if len(state_TSs) == 0:
+        # # no TS is in sight: pad a 'ghost ship' to avoid confusion for the agents
+        # if len(state_TSs) == 0:
 
-            # ED
-            ED_ghost = 1.0
+        #     # ED
+        #     ED_ghost = 1.0
 
-            # relative bearing
-            bng_rel_ghost = -1.0
+        #     # relative bearing
+        #     bng_rel_ghost = -1.0
 
-            # heading intersection angle
-            C_ghost = -1.0
+        #     # heading intersection angle
+        #     C_ghost = -1.0
 
-            # speed
-            V_ghost = 0.0
+        #     # speed
+        #     V_ghost = 0.0
 
-            # COLREG mode
-            sigma_ghost = 0
+        #     # COLREG mode
+        #     sigma_ghost = 0
 
-            # collision risk
-            CR_ghost = 0.0
+        #     # collision risk
+        #     CR_ghost = 0.0
 
-            state_TSs.append([ED_ghost, bng_rel_ghost, C_ghost, V_ghost, sigma_ghost, CR_ghost])
+        #     state_TSs.append([ED_ghost, bng_rel_ghost, C_ghost, V_ghost, sigma_ghost, CR_ghost])
 
-        # sort according to collision risk (ascending, larger CR is more dangerous)
-        state_TSs = sorted(state_TSs, key=lambda x: x[-1])
+        # # sort according to collision risk (ascending, larger CR is more dangerous)
+        # state_TSs = sorted(state_TSs, key=lambda x: x[-1])
 
-        #order = np.argsort(risk_ratios)[::-1]
-        #state_TSs = [state_TSs[idx] for idx in order]
+        # #order = np.argsort(risk_ratios)[::-1]
+        # #state_TSs = [state_TSs[idx] for idx in order]
+
+
+        # 在视线范围内不处理TS
+        if not state_TSs:
+            state_TSs.append([1.0, -1.0, -1.0, 0.0, 0, 0.0])  # "ghost ship"
+
+        # 根据设计选择进行分类和填充
+        state_TSs = sorted(state_TSs, key=lambda x: x[-1]) if self.state_design == "maxRisk" else np.array(state_TSs).flatten()
+        desired_length = self.num_obs_TS * max([self.N_TSs_max, 1])
+        state_TSs = np.pad(state_TSs, (0, max(0, desired_length - len(state_TSs))), 'constant', constant_values=np.nan)
+
 
         if self.state_design == "RecDQN":
 
@@ -563,6 +575,9 @@ class MMG_Env(gym.Env):
 
         #------------------------------- combine state ------------------------------
         self.state = np.concatenate([state_OS, state_goal, state_TSs], dtype=np.float32)
+
+      
+
 
 
     def step(self, a):
@@ -604,7 +619,13 @@ class MMG_Env(gym.Env):
         self._calculate_reward(a)
         d = self._done()
        
+    
+    
+    
         return self.state, self.r, d, {}
+        
+
+
 
 
     def _handle_respawn(self, TS):
