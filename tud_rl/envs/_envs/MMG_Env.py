@@ -445,173 +445,173 @@ class MMG_Env(gym.Env):
 
 
 
-    # def _set_state(self):
-    #     """State consists of (all from agent's perspective): 
-        
-    #     OS:
-    #         u, v, r
-    #         r_dot
-    #         rudder_angle
-
-    #     Goal:
-    #         relative bearing
-    #         ED_goal
-        
-    #     Dynamic obstacle:
-    #         ED_TS
-    #         relative bearing
-    #         heading intersection angle C_T
-    #         speed (V)
-    #         COLREG mode TS (sigma_TS)
-    #         CR
-    #     """
-
-    #     # quick access for OS
-    #     N0, E0, head0 = self.OS.eta
-
-    #     #-------------------------------- OS related ---------------------------------
-    #     cmp1 = self.OS.nu / np.array([7.0, 0.7, 0.004])
-    #     cmp2 = np.array([self.OS.nu_dot[2] / (8e-5),                   # r_dot
-    #                      self.OS.rud_angle / self.OS.rud_angle_max])   # rudder angle
-    #     state_OS = np.concatenate([cmp1, cmp2])
-
-
-    #     #------------------------------ goal related ---------------------------------
-    #     OS_goal_ED = ED(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"])
-    #     state_goal = np.array([bng_rel(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"], head0=head0, to_2pi=False) / (math.pi), 
-    #                            OS_goal_ED / self.E_max])
-
-
-    #     #--------------------------- dynamic obstacle related -------------------------
-    #     state_TSs = []
-
-    #     for TS_idx, TS in enumerate(self.TSs):
-
-    #         N, E, headTS = TS.eta
-
-    #         # consider TS if it is in sight
-    #         ED_OS_TS = ED(N0=N0, E0=E0, N1=N, E1=E, sqrt=True)
-
-    #         if ED_OS_TS <= self.sight:
-
-
-    #             # euclidean distance
-    #             D = get_ship_domain(A=self.OS.ship_domain_A, B=self.OS.ship_domain_B, C=self.OS.ship_domain_C, D=self.OS.ship_domain_D,\
-    #                  OS=self.OS, TS=TS)
-    #             ED_OS_TS_norm = (ED_OS_TS-D) / self.E_max
-
-    #             # relative bearing
-    #             bng_rel_TS = bng_rel(N0=N0, E0=E0, N1=N, E1=E, head0=head0, to_2pi=False) / (math.pi)
-
-    #             # heading intersection angle
-    #             C_TS = head_inter(head_OS=head0, head_TS=headTS, to_2pi=False) / (math.pi)
-
-    #             # speed
-    #             V_TS = TS._get_V() / 7.0
-
-    #             # COLREG mode
-    #             sigma_TS = self.TS_COLREGs[TS_idx]
-
-    #             # collision risk
-    #             CR = self._get_CR(OS=self.OS, TS=TS)
-
-    #             # store it
-    #             state_TSs.append([ED_OS_TS_norm, bng_rel_TS, C_TS, V_TS, sigma_TS, CR])
-
-    #     # no TS is in sight: pad a 'ghost ship' to avoid confusion for the agents
-    #     if len(state_TSs) == 0:
-
-    #         # ED
-    #         ED_ghost = 1.0
-
-    #         # relative bearing
-    #         bng_rel_ghost = -1.0
-
-    #         # heading intersection angle
-    #         C_ghost = -1.0
-
-    #         # speed
-    #         V_ghost = 0.0
-
-    #         # COLREG mode
-    #         sigma_ghost = 0
-
-    #         # collision risk
-    #         CR_ghost = 0.0
-
-    #         state_TSs.append([ED_ghost, bng_rel_ghost, C_ghost, V_ghost, sigma_ghost, CR_ghost])
-
-    #     # sort according to collision risk (ascending, larger CR is more dangerous)
-    #     state_TSs = sorted(state_TSs, key=lambda x: x[-1])
-
-    #     #order = np.argsort(risk_ratios)[::-1]
-    #     #state_TSs = [state_TSs[idx] for idx in order]
-
-    #     if self.state_design == "RecDQN":
-
-    #         # keep everything, pad nans at the right side to guarantee state size is always identical
-    #         state_TSs = np.array(state_TSs).flatten(order="C")
-
-    #         # at least one since there is always the ghost ship
-    #         desired_length = self.num_obs_TS * max([self.N_TSs_max, 1])  
-
-    #         state_TSs = np.pad(state_TSs, (0, desired_length - len(state_TSs)), \
-    #             'constant', constant_values=np.nan).astype(np.float32)
-
-    #     elif self.state_design == "maxRisk":
-
-    #         # select only highest risk TS
-    #         state_TSs = np.array(state_TSs[-1])
-
-    #     #------------------------------- combine state ------------------------------
-    #     self.state = np.concatenate([state_OS, state_goal, state_TSs], dtype=np.float32)
-
     def _set_state(self):
-        """Generate a state matrix for multiple agents with an identifier for each agent."""
-        num_agents = len(self.agents)
-        state_length = 25  # Original state vector length
-        state_matrix = np.zeros((num_agents, state_length + 1))  # +1 for the agent identifier
+        """State consists of (all from agent's perspective): 
+        
+        OS:
+            u, v, r
+            r_dot
+            rudder_angle
 
-        for idx, agent in enumerate(self.agents):
-            # Set the current agent as OS
-            self.OS = agent
-            N0, E0, head0 = self.OS.eta
+        Goal:
+            relative bearing
+            ED_goal
+        
+        Dynamic obstacle:
+            ED_TS
+            relative bearing
+            heading intersection angle C_T
+            speed (V)
+            COLREG mode TS (sigma_TS)
+            CR
+        """
 
-            # OS related states
-            cmp1 = self.OS.nu / np.array([7.0, 0.7, 0.004])
-            cmp2 = np.array([self.OS.nu_dot[2] / (8e-5), self.OS.rud_angle / self.OS.rud_angle_max])
-            state_OS = np.concatenate([cmp1, cmp2])
+        # quick access for OS
+        N0, E0, head0 = self.OS.eta
 
-            # Goal related states
-            OS_goal_ED = ED(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"])
-            state_goal = np.array([bng_rel(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"], head0=head0, to_2pi=False) / (math.pi),
-                                OS_goal_ED / self.E_max])
+        #-------------------------------- OS related ---------------------------------
+        cmp1 = self.OS.nu / np.array([7.0, 0.7, 0.004])
+        cmp2 = np.array([self.OS.nu_dot[2] / (8e-5),                   # r_dot
+                         self.OS.rud_angle / self.OS.rud_angle_max])   # rudder angle
+        state_OS = np.concatenate([cmp1, cmp2])
 
-            # Dynamic obstacle related states
-            state_TSs = []
-            for TS in self.TSs:
-                N, E, headTS = TS.eta
-                ED_OS_TS = ED(N0=N0, E0=E0, N1=N, E1=E, sqrt=True)
-                if ED_OS_TS <= self.sight:
-                    D = get_ship_domain(A=self.OS.ship_domain_A, B=self.OS.ship_domain_B, C=self.OS.ship_domain_C, D=self.OS.ship_domain_D,
-                                        OS=self.OS, TS=TS)
-                    ED_OS_TS_norm = (ED_OS_TS-D) / self.E_max
-                    bng_rel_TS = bng_rel(N0=N0, E0=E0, N1=N, E1=E, head0=head0, to_2pi=False) / (math.pi)
-                    C_TS = head_inter(head_OS=head0, head_TS=headTS, to_2pi=False) / (math.pi)
-                    V_TS = TS._get_V() / 7.0
-                    sigma_TS = self.TS_COLREGs[self.TSs.index(TS)]
-                    CR = self._get_CR(OS=self.OS, TS=TS)
-                    state_TSs.append([ED_OS_TS_norm, bng_rel_TS, C_TS, V_TS, sigma_TS, CR])
-            if not state_TSs:
-                state_TSs = [1.0, -1.0, -1.0, 0.0, 0, 0.0]  # Ghost ship data if no TS in sight
 
-            # Final state for the agent
-            agent_state = np.concatenate([state_OS, state_goal, np.array(state_TSs).flatten()])
-            state_matrix[idx, :-1] = agent_state  # All but last element are the state
-            state_matrix[idx, -1] = idx  # Last element is the agent identifier
+        #------------------------------ goal related ---------------------------------
+        OS_goal_ED = ED(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"])
+        state_goal = np.array([bng_rel(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"], head0=head0, to_2pi=False) / (math.pi), 
+                               OS_goal_ED / self.E_max])
 
-        self.state = state_matrix
-        return self.state
+
+        #--------------------------- dynamic obstacle related -------------------------
+        state_TSs = []
+
+        for TS_idx, TS in enumerate(self.TSs):
+
+            N, E, headTS = TS.eta
+
+            # consider TS if it is in sight
+            ED_OS_TS = ED(N0=N0, E0=E0, N1=N, E1=E, sqrt=True)
+
+            if ED_OS_TS <= self.sight:
+
+
+                # euclidean distance
+                D = get_ship_domain(A=self.OS.ship_domain_A, B=self.OS.ship_domain_B, C=self.OS.ship_domain_C, D=self.OS.ship_domain_D,\
+                     OS=self.OS, TS=TS)
+                ED_OS_TS_norm = (ED_OS_TS-D) / self.E_max
+
+                # relative bearing
+                bng_rel_TS = bng_rel(N0=N0, E0=E0, N1=N, E1=E, head0=head0, to_2pi=False) / (math.pi)
+
+                # heading intersection angle
+                C_TS = head_inter(head_OS=head0, head_TS=headTS, to_2pi=False) / (math.pi)
+
+                # speed
+                V_TS = TS._get_V() / 7.0
+
+                # COLREG mode
+                sigma_TS = self.TS_COLREGs[TS_idx]
+
+                # collision risk
+                CR = self._get_CR(OS=self.OS, TS=TS)
+
+                # store it
+                state_TSs.append([ED_OS_TS_norm, bng_rel_TS, C_TS, V_TS, sigma_TS, CR])
+
+        # no TS is in sight: pad a 'ghost ship' to avoid confusion for the agents
+        if len(state_TSs) == 0:
+
+            # ED
+            ED_ghost = 1.0
+
+            # relative bearing
+            bng_rel_ghost = -1.0
+
+            # heading intersection angle
+            C_ghost = -1.0
+
+            # speed
+            V_ghost = 0.0
+
+            # COLREG mode
+            sigma_ghost = 0
+
+            # collision risk
+            CR_ghost = 0.0
+
+            state_TSs.append([ED_ghost, bng_rel_ghost, C_ghost, V_ghost, sigma_ghost, CR_ghost])
+
+        # sort according to collision risk (ascending, larger CR is more dangerous)
+        state_TSs = sorted(state_TSs, key=lambda x: x[-1])
+
+        #order = np.argsort(risk_ratios)[::-1]
+        #state_TSs = [state_TSs[idx] for idx in order]
+
+        if self.state_design == "RecDQN":
+
+            # keep everything, pad nans at the right side to guarantee state size is always identical
+            state_TSs = np.array(state_TSs).flatten(order="C")
+
+            # at least one since there is always the ghost ship
+            desired_length = self.num_obs_TS * max([self.N_TSs_max, 1])  
+
+            state_TSs = np.pad(state_TSs, (0, desired_length - len(state_TSs)), \
+                'constant', constant_values=np.nan).astype(np.float32)
+
+        elif self.state_design == "maxRisk":
+
+            # select only highest risk TS
+            state_TSs = np.array(state_TSs[-1])
+
+        #------------------------------- combine state ------------------------------
+        self.state = np.concatenate([state_OS, state_goal, state_TSs], dtype=np.float32)
+
+    # def _set_state(self):
+    #     """Generate a state matrix for multiple agents with an identifier for each agent."""
+    #     num_agents = len(self.agents)
+    #     state_length = 25  # Original state vector length
+    #     state_matrix = np.zeros((num_agents, state_length + 1))  # +1 for the agent identifier
+
+    #     for idx, agent in enumerate(self.agents):
+    #         # Set the current agent as OS
+    #         self.OS = agent
+    #         N0, E0, head0 = self.OS.eta
+
+    #         # OS related states
+    #         cmp1 = self.OS.nu / np.array([7.0, 0.7, 0.004])
+    #         cmp2 = np.array([self.OS.nu_dot[2] / (8e-5), self.OS.rud_angle / self.OS.rud_angle_max])
+    #         state_OS = np.concatenate([cmp1, cmp2])
+
+    #         # Goal related states
+    #         OS_goal_ED = ED(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"])
+    #         state_goal = np.array([bng_rel(N0=N0, E0=E0, N1=self.goal["N"], E1=self.goal["E"], head0=head0, to_2pi=False) / (math.pi),
+    #                             OS_goal_ED / self.E_max])
+
+    #         # Dynamic obstacle related states
+    #         state_TSs = []
+    #         for TS in self.TSs:
+    #             N, E, headTS = TS.eta
+    #             ED_OS_TS = ED(N0=N0, E0=E0, N1=N, E1=E, sqrt=True)
+    #             if ED_OS_TS <= self.sight:
+    #                 D = get_ship_domain(A=self.OS.ship_domain_A, B=self.OS.ship_domain_B, C=self.OS.ship_domain_C, D=self.OS.ship_domain_D,
+    #                                     OS=self.OS, TS=TS)
+    #                 ED_OS_TS_norm = (ED_OS_TS-D) / self.E_max
+    #                 bng_rel_TS = bng_rel(N0=N0, E0=E0, N1=N, E1=E, head0=head0, to_2pi=False) / (math.pi)
+    #                 C_TS = head_inter(head_OS=head0, head_TS=headTS, to_2pi=False) / (math.pi)
+    #                 V_TS = TS._get_V() / 7.0
+    #                 sigma_TS = self.TS_COLREGs[self.TSs.index(TS)]
+    #                 CR = self._get_CR(OS=self.OS, TS=TS)
+    #                 state_TSs.append([ED_OS_TS_norm, bng_rel_TS, C_TS, V_TS, sigma_TS, CR])
+    #         if not state_TSs:
+    #             state_TSs = [1.0, -1.0, -1.0, 0.0, 0, 0.0]  # Ghost ship data if no TS in sight
+
+    #         # Final state for the agent
+    #         agent_state = np.concatenate([state_OS, state_goal, np.array(state_TSs).flatten()])
+    #         state_matrix[idx, :-1] = agent_state  # All but last element are the state
+    #         state_matrix[idx, -1] = idx  # Last element is the agent identifier
+
+    #     self.state = state_matrix
+    #     return self.state
 
 
 
