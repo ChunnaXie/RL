@@ -150,20 +150,21 @@ class MMG_Star(MMG_Env):
 
     def _calculate_aggregated_reward(self):
         """Calculate and aggregate the rewards for all agents."""
-        total_reward = 0
+        rewards_agg = []  # List to store rewards from each agent
         for idx, agent in enumerate(self.agents):
             # Assuming each agent acts as OS in its own scenario
             self.OS = agent
-            #  May be I need to set or update the state of other ships relative to this OS
+            # Maybe I need to set or update the state of other ships relative to this OS
             self.TSs = [TS_agent for TS_idx, TS_agent in enumerate(self.agents) if idx != TS_idx]
 
-            # Here we simulate updating the state and calculating reward as if each agent is the OS
-          
+            #  we simulate updating the state and calculating reward as if each agent is the OS
+            
             self._update_state_based_on_action(self.actions[idx])  # This line assumes I have a way to track actions for each agent
             self._calculate_reward()  # This uses the reward calculation from MMG_Env
-            total_reward += self.r
+            rewards_agg.append(self.r)
 
-        return total_reward
+
+        return rewards_agg
 
     def _done(self):
         """Returns boolean flag whether episode is over."""
