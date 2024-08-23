@@ -159,7 +159,7 @@ class MMG_Star(MMG_Env):
 
             #  we simulate updating the state and calculating reward as if each agent is the OS
             
-            self._update_state_based_on_action(self.actions[idx])  # This line assumes I have a way to track actions for each agent
+            
             self._calculate_reward()  # This uses the reward calculation from MMG_Env
             rewards_agg.append(self.r)
 
@@ -239,3 +239,7 @@ class MMG_Star(MMG_Env):
                 self.ax0.add_patch(circ)
 
             plt.pause(0.001)
+
+    
+    def seed(self,):
+        ...

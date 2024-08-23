@@ -110,8 +110,8 @@ def train(c: ConfigFile, agent_name: str):
     c.num_actions = env.action_space.n
 
     # seeding
-    env.seed(c.seed)
-    test_env.seed(c.seed)
+    env.seed()
+    test_env.seed()
     torch.manual_seed(c.seed)
     torch.cuda.manual_seed(c.seed)
     np.random.seed(c.seed)
