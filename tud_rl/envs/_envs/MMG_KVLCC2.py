@@ -555,7 +555,8 @@ class KVLCC2:
         1 - increase rudder angle
         2 - decrease rudder angle
         """
-        # store action for rendering
+        # store action for rendering b d:\app\microsoft vs code\git\rl\tud_rl\envs\_envs\MMG_KVLCC2.py:559
+        a = a.item()
         self.action = a
         assert isinstance(a, int) and a in range(3), "Unknown action."
 

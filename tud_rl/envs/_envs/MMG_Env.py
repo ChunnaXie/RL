@@ -169,7 +169,7 @@ class MMG_Env(gym.Env):
 
         # initial distance to goal
         self.OS_goal_init = ED(N0=self.OS.eta[0], E0=self.OS.eta[1], N1=self.goal["N"], E1=self.goal["E"])
-        self.OS_goal_old  = self.OS_goal_init
+        self.OS_goal_old = self.OS_goal_init
 
         # initially compute ship domain for plotting
         rads  = np.linspace(0.0, 2*math.pi, 25)
