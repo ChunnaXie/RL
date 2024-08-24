@@ -16,7 +16,7 @@ agent:
     tgt_noise_clip:
     pol_upd_delay: 2
 seed: 42
-timesteps: 5_000_000
+timesteps: 5_000_0
 epoch_length: 5000
 eval_episodes: 10
 actor_weights:
@@ -46,4 +46,4 @@ act_start_step: 5000
 upd_start_step: 5000
 upd_every: 100
 batch_size: 1024
-device: cpu
+device: cuda

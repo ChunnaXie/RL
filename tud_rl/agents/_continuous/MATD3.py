@@ -56,7 +56,8 @@ class MATD3Agent(MADDPGAgent):
             # we need target actions from all agents
             target_a = torch.zeros((self.batch_size, self.N_agents, self.num_actions), dtype=torch.float32)
             for j in range(self.N_agents):
-                s2_j = s2[:, j]
+                #s2_j = s2[:, j]
+                s2_j = s2[:, j].to(self.device)
                 
                 if self.is_continuous:
                     target_a[:, j] = self.target_actor[j](s2_j)
@@ -71,7 +72,16 @@ class MATD3Agent(MADDPGAgent):
                 target_a = torch.clamp(target_a, -1, 1)
 
             # next Q-estimate
-            s2a2_for_Q = torch.cat([s2.reshape(self.batch_size, -1), target_a.reshape(self.batch_size, -1)], dim=1)
+            
+            # 确保 s2 和 target_a 的形状和设备位置正确，然后合并
+            s2 = s2.reshape(self.batch_size, -1).to(self.device)  # 重新调整形状并确保设备一致性
+            target_a = target_a.reshape(self.batch_size, -1).to(self.device)  # 重新调整形状并确保设备一致性
+            s2a2_for_Q = torch.cat([s2, target_a], dim=1)  # 合并张量
+
+
+            
+            #s2a2_for_Q = torch.cat([s2.reshape(self.batch_size, -1), target_a.reshape(self.batch_size, -1)], dim=1)
+        
             Q_next1, Q_next2 = self.target_critic[i](s2a2_for_Q)
             Q_next = torch.min(Q_next1, Q_next2)
 

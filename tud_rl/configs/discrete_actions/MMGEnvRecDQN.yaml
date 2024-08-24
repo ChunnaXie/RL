@@ -114,7 +114,7 @@ agent:
     num_obs_OS: 7
     num_obs_TS: 6
 seed: 12
-timesteps: 10_000_000
+timesteps: 10_000_0
 epoch_length: 5000
 eval_episodes: 10
 dqn_weights:
@@ -141,4 +141,4 @@ act_start_step: 1000
 upd_start_step: 1000
 upd_every: 1
 batch_size: 32
-device: cpu
+device: cuda

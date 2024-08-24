@@ -18,6 +18,7 @@ from tud_rl.common.logging_func import EpochLogger
 from tud_rl.common.logging_plot import plot_from_progress
 from tud_rl.wrappers import get_wrapper
 
+from tqdm import tqdm
 
 def evaluate_policy(test_env: gym.Env, agent: _Agent, c: ConfigFile):
 
@@ -165,7 +166,7 @@ def train(c: ConfigFile, agent_name: str):
     epi_ret = np.zeros((agent.N_agents, 1)) if agent.is_multi else 0.0
 
     # main loop
-    for total_steps in range(c.timesteps):
+    for total_steps in tqdm(range(c.timesteps)):
 
         epi_steps += 1
 

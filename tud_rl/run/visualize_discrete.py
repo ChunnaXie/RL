@@ -8,11 +8,11 @@ import tud_rl.agents.discrete as agents
 from tud_rl.agents.base import _Agent
 from tud_rl.common.configparser import ConfigFile
 from tud_rl.wrappers import get_wrapper
-
+from tqdm import tqdm
 
 def visualize_policy(env: gym.Env, agent: _Agent, c: ConfigFile):
 
-    for _ in range(c.eval_episodes):
+    for _ in tqdm(range(c.eval_episodes)):
 
         # LSTM: init history
         if agent.needs_history:
@@ -86,7 +86,8 @@ def test(c: ConfigFile, agent_name: str):
     c.num_actions = env.action_space.n
 
     # seeding
-    env.seed(c.seed)
+    env.seed()
+    #env.seed(c.seed)
     torch.manual_seed(c.seed)
     np.random.seed(c.seed)
     random.seed(c.seed)

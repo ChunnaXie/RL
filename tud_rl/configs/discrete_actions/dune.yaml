@@ -141,4 +141,4 @@ act_start_step: 1000
 upd_start_step: 1000
 upd_every: 1
 batch_size: 32
-device: cpu
+device: cuda
