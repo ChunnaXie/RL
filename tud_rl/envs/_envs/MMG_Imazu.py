@@ -280,3 +280,6 @@ class MMG_Imazu(MMG_Env):
 
         elif self.situation == 23:
             self.TSs = []
+
+    def seed(self,):
+        ...

@@ -31,6 +31,8 @@ def visualize_policy(env: gym.Env, agent: _Agent, c: ConfigFile):
 
             eval_epi_steps += 1
 
+
+
             # render env
             env.render()
 
@@ -63,6 +65,8 @@ def visualize_policy(env: gym.Env, agent: _Agent, c: ConfigFile):
             # break option
             if eval_epi_steps == c.Env.max_episode_steps:
                 break
+
+        
         print(cur_ret)
 
 

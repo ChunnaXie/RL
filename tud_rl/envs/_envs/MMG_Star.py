@@ -1,5 +1,9 @@
 from tud_rl.envs._envs.MMG_Env import *
 from tud_rl.envs._envs.VesselPlots import get_rect
+from tud_rl.envs._envs.MMG_Env import MMG_Env
+
+
+
 
 class MMG_Star(MMG_Env):
     """This environment contains four agents, each steering a KVLCC2."""
@@ -8,6 +12,7 @@ class MMG_Star(MMG_Env):
         super().__init__(N_TSs_max=N_TSs_max, state_design=state_design, pdf_traj=True, N_TSs_increasing=False, N_TSs_random=False)
         assert N_TSs_max in [3, 7, 15], "Consider either 4, 8, or 16 ships in total."
         self.N_TSs = self.N_TSs_max
+
     
 
     def reset(self):
@@ -43,7 +48,7 @@ class MMG_Star(MMG_Env):
 
         # init four goals
         self.goals = []
-        self.OS_goal_old = []
+        self.OS_goals_old = []
         for _, agent in enumerate(self.agents):
             a_N = agent.eta[0]
             a_E = agent.eta[1]
@@ -55,7 +60,7 @@ class MMG_Star(MMG_Env):
             E_add, N_add = xy_from_polar(r=2*ED_CPA, angle=bng_abs_CPA)
             g = {"N" : a_N + N_add, "E" : a_E + E_add}
             self.goals.append(g)
-            self.OS_goal_old.append(ED_CPA)
+            self.OS_goals_old.append(ED_CPA)
         
         self.respawn_flags = [True for _ in self.agents]
         # determine current COLREG situations
@@ -133,12 +138,15 @@ class MMG_Star(MMG_Env):
         # update dynamics
         [agent._upd_dynamics() for idx, agent in enumerate(self.agents) if not self.finished[idx]]
 
+
+
         # update COLREG scenarios
         self._set_COLREGs()
 
         # compute state, reward, done        
         self._set_aggregated_state()
-        self._calculate_aggregated_reward(a)
+        rewards_agg = self._calculate_aggregated_reward(a)
+        #self._calculate_aggregated_reward(a)
         d = self._done()
 
         # increase step cnt and overall simulation time
@@ -148,13 +156,13 @@ class MMG_Star(MMG_Env):
         # trajectory plotting
         self.TrajPlotter.step(OS=self.agents[0], TSs=self.agents[1:], respawn_flags=[False for _ in range(self.N_TSs)], step_cnt=self.step_cnt)
         
-        return self.state_agg, self.r, d, {}
+        return self.state_agg, rewards_agg, d, {}
 
 
 
     def _calculate_aggregated_reward(self, a):
         """Calculate and aggregate the rewards for all agents."""
-        rewards_agg = []  # List to store rewards from each agent
+        rewards_agg = np.zeros((self.N_TSs+1, 1)) # List to store rewards from each agent
         for idx, agent in enumerate(self.agents):
             # Assuming each agent acts as OS in its own scenario
             self.OS = agent
@@ -165,8 +173,10 @@ class MMG_Star(MMG_Env):
             
             # self.OS_goal_ED = ED(N0=agent.eta[0], E0=agent.eta[1], N1=self.goals[idx]["N"], E1=self.goals[idx]["E"])
             self.goal["N"], self.goal["E"] = self.goals[idx]["N"], self.goals[idx]["E"]
+            self.OS_goal_old = self.OS_goals_old[idx]
             self._calculate_reward(a[idx])  # This uses the reward calculation from MMG_Env
-            rewards_agg.append(self.r)
+            self.OS_goals_old[idx] = self.OS_goal_old
+            rewards_agg[idx][0] = self.r
 
 
         return rewards_agg

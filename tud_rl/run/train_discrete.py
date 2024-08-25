@@ -3,7 +3,7 @@ import pickle
 import random
 import shutil
 import time
-
+import matplotlib.pyplot as plt
 import gym
 import numpy as np
 import pandas as pd
@@ -25,6 +25,9 @@ def evaluate_policy(test_env: gym.Env, agent: _Agent, c: ConfigFile):
     # go greedy
     agent.mode = "test"
 
+    
+
+
     rets = []
 
     for _ in range(c.eval_episodes):
@@ -41,6 +44,8 @@ def evaluate_policy(test_env: gym.Env, agent: _Agent, c: ConfigFile):
         cur_ret = np.zeros((agent.N_agents, 1)) if agent.is_multi else 0.0
         d = False
         eval_epi_steps = 0
+
+
 
         while not d:
 
@@ -87,6 +92,9 @@ def evaluate_policy(test_env: gym.Env, agent: _Agent, c: ConfigFile):
 def train(c: ConfigFile, agent_name: str):
     """Main training loop."""
 
+    
+    
+    
     # measure computation time
     start_time = time.time()
 
@@ -214,8 +222,14 @@ def train(c: ConfigFile, agent_name: str):
         # s becomes s2
         s = s2
 
+
         # end of episode handling
         if d or (epi_steps == c.Env.max_episode_steps):
+
+            print(f"Episode Reward: {epi_ret}, Episode Steps: {epi_steps}")
+
+
+
 
             # reset active head for BootDQN and its modifications
             if isinstance(agent, BootDQNAgent):
