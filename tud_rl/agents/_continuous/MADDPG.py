@@ -133,10 +133,15 @@ class MADDPGAgent(BaseAgent):
         self.replay_buffer.add(s, a, r, s2, d)
 
     def _compute_target(self, r, s2, d, i):
+
+
         with torch.no_grad():
+            
+            # Move tensors to the same device
+            s2 = s2.to(self.device)
 
             # we need target actions from all agents
-            target_a = torch.zeros((self.batch_size, self.N_agents, self.num_actions), dtype=torch.float32)
+            target_a = torch.zeros((self.batch_size, self.N_agents, self.num_actions), dtype=torch.float32).to(self.device)
             for j in range(self.N_agents):
                 s2_j = s2[:, j]
 

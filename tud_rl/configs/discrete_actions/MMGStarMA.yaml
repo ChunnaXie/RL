@@ -78,12 +78,12 @@ agent:
     num_obs_OS: 7
     num_obs_TS: 6
 seed: 1020
-timesteps: 1501
+timesteps: 30000
 epoch_length: 5000
 eval_episodes: 1
 
-actor_weights: 
-critic_weights: 
+actor_weights: D:\APP\Microsoft VS Code\Git\RL\experiments\6_0826_DiscMATD3_MMGStar-v0__2024-08-26_1020\DiscMATD3_actor_weights.pth
+critic_weights: D:\APP\Microsoft VS Code\Git\RL\experiments\6_0826_DiscMATD3_MMGStar-v0__2024-08-26_1020\DiscMATD3_critic_weights.pth
 lr_actor: 0.01
 lr_critic: 0.01
 tau: 0.01
