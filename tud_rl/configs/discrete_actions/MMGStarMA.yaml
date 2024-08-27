@@ -14,6 +14,7 @@ agent:
     tgt_noise:
     tgt_noise_clip:
     pol_upd_delay: 2
+  IDQN: {}
   DQN: {}
   DDQN: {}
   SCDQN_a:
