@@ -30,7 +30,7 @@ class MMG_Env(gym.Env):
                  w_dist           = 1.0,
                  w_head           = 1.0,
                  w_coll           = 10.0,
-                 w_COLREG         = 1.0,
+                 w_COLREG         = 10.0,
                  w_comf           = 1.0,
                  ada_r_comf       = False,
                  nonlinear_r_coll = False,
@@ -849,7 +849,7 @@ class MMG_Env(gym.Env):
 
                     # steer to the right in Head-on and starboard crossing situations
                     if self.TS_COLREGs_old[TS_idx] in [1, 2] and self.OS.nu[2] < 0.0:
-                        r_COLREG -= 1000.0
+                        r_COLREG -= 100000.0
 
         # --------------------------------- 5. Comfort penalty --------------------------------
         if a == 0:
