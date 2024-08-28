@@ -17,6 +17,7 @@ def plot_from_progress(dir, alg, env_str, info=None):
         alg (string):     used algorithm
         info (string):    further information to display in the header
     """
+    return
     # open progress file and load it into pandas
     with open(f"{dir}/progress.txt") as f:
         reader = csv.reader(f, delimiter="\t")

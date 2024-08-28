@@ -178,10 +178,10 @@ class MMG_Star(MMG_Env):
             self.OS_goals_old[idx] = self.OS_goal_old
             rewards_agg[idx][0] = self.r
             # Print the values of r_dist, w_dist, r_head, r_coll, w_coll, r_COLREG, w_COLREG, r_comf, w_comf, w_sum, and maddpg
-            print(f"Agent {idx}:  r_dist: {self.r_dist:.4f}, w_dist: {self.w_dist:.4f}, r_head: {self.r_head:.4f}, w_head: {self.w_head:.4f},"
-        f"r_coll: {self.r_coll:.4f}, w_coll: {self.w_coll:.4f}, r_COLREG: {self.r_COLREG:.4f}, "
-        f"w_COLREG: {self.w_COLREG:.4f}, r_comf: {self.r_comf:.4f}, w_comf: {self.w_comf:.4f}, "
-)
+#             print(f"Agent {idx}:  r_dist: {self.r_dist:.4f}, w_dist: {self.w_dist:.4f}, r_head: {self.r_head:.4f}, w_head: {self.w_head:.4f},"
+#         f"r_coll: {self.r_coll:.4f}, w_coll: {self.w_coll:.4f}, r_COLREG: {self.r_COLREG:.4f}, "
+#         f"w_COLREG: {self.w_COLREG:.4f}, r_comf: {self.r_comf:.4f}, w_comf: {self.w_comf:.4f}, "
+# )
 
 
         return rewards_agg

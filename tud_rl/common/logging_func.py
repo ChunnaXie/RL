@@ -150,6 +150,7 @@ class Logger:
         Write all of the diagnostics from the current iteration.
         Writes both to stdout, and to the output file.
         """
+        return
         vals = []
         key_lens = [len(key) for key in self.log_headers]
         max_key_len = max(15, max(key_lens))
@@ -218,6 +219,7 @@ class EpochLogger(Logger):
             average_only (bool): If true, do not log the standard deviation
                 of the diagnostic over the epoch.
         """
+        return
         if val is not None:
             super().log_tabular(key, val)
         else:

@@ -302,42 +302,46 @@ def train(c: ConfigFile, agent_name: str):
 def save_weights(agent: _Agent, eval_ret) -> None:
 
     # check whether this was the best evaluation epoch so far
-    with open(f"{agent.logger.output_dir}/progress.txt") as f:
-        reader = csv.reader(f, delimiter="\t")
-        d = list(reader)
+    # with open(f"{agent.logger.output_dir}/progress.txt") as f:
+    #     reader = csv.reader(f, delimiter="\t")
+    #     d = list(reader)
 
-    df = pd.DataFrame(d)
-    df.columns = df.iloc[0]
-    df = df.iloc[1:]
-    df = df.astype(float)
+    # df = pd.DataFrame(d)
+    # df.columns = df.iloc[0]
+    # df = df.iloc[1:]
+    # df = df.astype(float)
 
-    # no best-weight-saving for multi-agent problems since the definition of best weights is not straightforward anymore
-    if agent.is_multi:
-        best_weights = False
-    elif len(df["Avg_Eval_ret"]) == 1:
-        best_weights = True
-    else:
-        if np.mean(eval_ret) > max(df["Avg_Eval_ret"][:-1]):
-            best_weights = True
-        else:
-            best_weights = False
+    # # no best-weight-saving for multi-agent problems since the definition of best weights is not straightforward anymore
+    # if agent.is_multi:
+    #     best_weights = False
+    # elif len(df["Avg_Eval_ret"]) == 1:
+    #     best_weights = True
+    # else:
+    #     if np.mean(eval_ret) > max(df["Avg_Eval_ret"][:-1]):
+    #         best_weights = True
+    #     else:
+    #         best_weights = False
 
     # save net
-    if hasattr(agent, "DQN"):
-        torch.save(agent.DQN.state_dict(),
-                    f"{agent.logger.output_dir}/{agent.name}_weights.pth")
+    # if hasattr(agent, "DQN"):
+    #     torch.save(agent.DQN.state_dict(),
+    #                 f"{agent.logger.output_dir}/{agent.name}_weights.pth")
 
-        if best_weights:
-            torch.save(agent.DQN.state_dict(),
-                        f"{agent.logger.output_dir}/{agent.name}_best_weights.pth")
-    else:
-        torch.save(agent.actor.state_dict(), f"{agent.logger.output_dir}/{agent.name}_actor_weights.pth")
-        torch.save(agent.critic.state_dict(), f"{agent.logger.output_dir}/{agent.name}_critic_weights.pth")
+    #     if best_weights:
+    #         torch.save(agent.DQN.state_dict(),
+    #                     f"{agent.logger.output_dir}/{agent.name}_best_weights.pth")
+    # else:
+    #     torch.save(agent.actor.state_dict(), f"{agent.logger.output_dir}/{agent.name}_actor_weights.pth")
+    #     torch.save(agent.critic.state_dict(), f"{agent.logger.output_dir}/{agent.name}_critic_weights.pth")
 
-        if best_weights:
-            torch.save(agent.actor.state_dict(), f"{agent.logger.output_dir}/{agent.name}_actor_best_weights.pth")
-            torch.save(agent.critic.state_dict(), f"{agent.logger.output_dir}/{agent.name}_critic_best_weights.pth")
+    #     if best_weights:
+    #         torch.save(agent.actor.state_dict(), f"{agent.logger.output_dir}/{agent.name}_actor_best_weights.pth")
+    #         torch.save(agent.critic.state_dict(), f"{agent.logger.output_dir}/{agent.name}_critic_best_weights.pth")
 
-    # stores the replay buffer
-    with open(f"{agent.logger.output_dir}/buffer.pickle", "wb") as handle:
-        pickle.dump(agent.replay_buffer, handle)
+    # # stores the replay buffer
+    # with open(f"{agent.logger.output_dir}/buffer.pickle", "wb") as handle:
+    #     pickle.dump(agent.replay_buffer, handle)
+    if hasattr(agent, "DQNs"):
+        for i in range(agent.N_agents):
+            torch.save(agent.DQNs[i].DQN.state_dict(),
+                        f"{agent.logger.output_dir}/{agent.name}_{i}_weights.pth")
