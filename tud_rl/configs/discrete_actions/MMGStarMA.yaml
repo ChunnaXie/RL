@@ -79,7 +79,7 @@ agent:
     num_obs_OS: 7
     num_obs_TS: 6
 seed: 1020
-timesteps: 1000000
+timesteps: 400000
 epoch_length: 5000
 eval_episodes: 1
 
@@ -88,11 +88,11 @@ critic_weights:
 lr_actor: 0.1
 lr_critic: 0.1
 tau: 0.01
-dqn_weights: 
+dqn_weights: D:\APP\Microsoft VS Code\Git\RL\experiments\IDQN_MMGStar-v0__2024-09-04_1020\IDQN_0_weights.pth
 gamma: 0.999
 eps_init: 1
 eps_final: 0.1
-eps_decay_steps: 100000
+eps_decay_steps: 40000
 tgt_update_freq: 1000
 net_struc:
 - - 128

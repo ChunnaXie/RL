@@ -27,8 +27,8 @@ class MMG_Env(gym.Env):
                  N_TSs_increasing = False,
                  state_design     = "RecDQN", 
                  pdf_traj         = True,
-                 w_dist           = 1.0,
-                 w_head           = 1.0,
+                 w_dist           = 2.0,
+                 w_head           = 2.0,
                  w_coll           = 1.0,
                  w_COLREG         = 1.0,
                  w_comf           = 1.0,
@@ -826,14 +826,14 @@ class MMG_Env(gym.Env):
         r_COLREG = 0
 
         for TS_idx, TS in enumerate(self.TSs):
-
+            #获取目标船与本船的距离
             # get ED
             ED_TS = ED(N0=N0, E0=E0, N1=TS.eta[0], E1=TS.eta[1])
 
             # reward based on collision risk
             CR = self._get_CR(OS=self.OS, TS=TS)
             if CR == 1.0:
-                r_coll -= 10.0
+                r_coll -= 1000.0
             else:
                 if self.nonlinear_r_coll:
                     r_coll -= math.sqrt(CR)
@@ -847,9 +847,9 @@ class MMG_Env(gym.Env):
                 if ED_TS <= self.sight and tcpa(NOS=N0, EOS=E0, NTS=TS.eta[0], ETS=TS.eta[1],\
                      chiOS=self.OS._get_course(), chiTS=TS._get_course(), VOS=self.OS._get_V(), VTS=TS._get_V()) >= 0.0:
 
-                    # steer to the right in Head-on and starboard crossing situations
+                    # steer to the right in Head-on and starboard crossing situations在对头和右侧交叉下，本船的转向角度小于0(左转)，给惩罚
                     if self.TS_COLREGs_old[TS_idx] in [1, 2] and self.OS.nu[2] < 0.0:
-                        r_COLREG -= 10.0
+                        r_COLREG -= 100000.0
 
         # --------------------------------- 5. Comfort penalty --------------------------------
         if a == 0:

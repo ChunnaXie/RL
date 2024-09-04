@@ -129,8 +129,35 @@ class MMG_Star(MMG_Env):
             self.TS_COLREGs_all.append(TS_COLREGs_agent)
 
 
+        # 2、舵角输出
+        # 3、reward的调整
+        # 4、问助教
+        # 5、曲线图在哪里画的，模块
+        # 6、继续report
+        # 7、国际避碰规则的reward
+        # 8、重命名问题
+        # 9、DCPA、TCPA、CR的输出
+
     def step(self, a):
-        """The action a is a list of four integers, each representing an action for an agent."""
+    #The action a is a list of four integers, each representing an action for an agent."""
+
+    # 1. 概率反转动作，百分之20变为其他
+        def probabilistic_action_inversion(actions, inversion_prob=0.2):
+            #Inverts given actions with a certain probability."""
+            inverted_actions = []
+            for action in actions:
+                if np.random.rand() < inversion_prob:
+                    # Assume actions are discrete and range from 0 to n-1
+                    total_actions = self.action_space.n
+                    # Generate a random action that is different from the current action
+                    new_action = np.random.choice([act for act in range(total_actions) if act != action])
+                    inverted_actions.append(new_action)
+                else:
+                    inverted_actions.append(action)
+            return inverted_actions
+
+        # Apply the action inversion function with a defined probability of inversion
+        a = probabilistic_action_inversion(a, inversion_prob=0.2)
 
         # perform control action
         [self.agents[idx]._control(act) for idx, act in enumerate(a) if not self.finished[idx]]
@@ -138,15 +165,12 @@ class MMG_Star(MMG_Env):
         # update dynamics
         [agent._upd_dynamics() for idx, agent in enumerate(self.agents) if not self.finished[idx]]
 
-
-
         # update COLREG scenarios
         self._set_COLREGs()
 
         # compute state, reward, done        
         self._set_aggregated_state()
         rewards_agg = self._calculate_aggregated_reward(a)
-        #self._calculate_aggregated_reward(a)
         d = self._done()
 
         # increase step cnt and overall simulation time
@@ -155,8 +179,68 @@ class MMG_Star(MMG_Env):
 
         # trajectory plotting
         self.TrajPlotter.step(OS=self.agents[0], TSs=self.agents[1:], respawn_flags=[False for _ in range(self.N_TSs)], step_cnt=self.step_cnt)
-        
+    
         return self.state_agg, rewards_agg, d, {}
+
+
+    # def step(self, a):
+    #     """The action a is a list of four integers, each representing an action for an agent."""
+
+    #     # 1、a012的长为4的向量，加一个概率反转概率函数，百分之20变为其他
+
+
+    #     # Apply the action inversion function
+    #     a = probabilistic_action_inversion(a)
+
+    #     # perform control action
+    #     [self.agents[idx]._control(act) for idx, act in enumerate(a) if not self.finished[idx]]
+
+    #     # update dynamics
+    #     [agent._upd_dynamics() for idx, agent in enumerate(self.agents) if not self.finished[idx]]
+
+    #     # update COLREG scenarios
+    #     self._set_COLREGs()
+
+    #     # compute state, reward, done        
+    #     self._set_aggregated_state()
+    #     rewards_agg = self._calculate_aggregated_reward(a)
+    #     d = self._done()
+
+    #     # increase step cnt and overall simulation time
+    #     self.step_cnt += 1
+    #     self.sim_t += self.delta_t
+
+    #     # trajectory plotting
+    #     self.TrajPlotter.step(OS=self.agents[0], TSs=self.agents[1:], respawn_flags=[False for _ in range(self.N_TSs)], step_cnt=self.step_cnt)
+        
+    #     return self.state_agg, rewards_agg, d, {}
+
+
+    #     # perform control action
+    #     [self.agents[idx]._control(act) for idx, act in enumerate(a) if not self.finished[idx]]
+
+    #     # update dynamics
+    #     [agent._upd_dynamics() for idx, agent in enumerate(self.agents) if not self.finished[idx]]
+
+
+
+    #     # update COLREG scenarios
+    #     self._set_COLREGs()
+
+    #     # compute state, reward, done        
+    #     self._set_aggregated_state()
+    #     rewards_agg = self._calculate_aggregated_reward(a)
+    #     #self._calculate_aggregated_reward(a)
+    #     d = self._done()
+
+    #     # increase step cnt and overall simulation time
+    #     self.step_cnt += 1
+    #     self.sim_t += self.delta_t
+
+    #     # trajectory plotting
+    #     self.TrajPlotter.step(OS=self.agents[0], TSs=self.agents[1:], respawn_flags=[False for _ in range(self.N_TSs)], step_cnt=self.step_cnt)
+        
+    #     return self.state_agg, rewards_agg, d, {}
 
 
 

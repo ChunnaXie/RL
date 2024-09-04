@@ -45,7 +45,8 @@ class IDQNAgent(BaseAgent):
             if self.state_type == "feature":
 
                 self.DQNs  = []
-                for _ in range(self.N_agents):
+                for i in range(self.N_agents):
+                    c.dqn_weights = c.dqn_weights[:-13] + str(i) + c.dqn_weights[-12:]
                     self.DQNs.append(DQNAgent(c, agent_name))
                 self.n_params = self.DQNs[0].n_params * self.N_agents
                 
