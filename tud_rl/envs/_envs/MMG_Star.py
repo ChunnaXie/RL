@@ -258,6 +258,7 @@ class MMG_Star(MMG_Env):
             # self.OS_goal_ED = ED(N0=agent.eta[0], E0=agent.eta[1], N1=self.goals[idx]["N"], E1=self.goals[idx]["E"])
             self.goal["N"], self.goal["E"] = self.goals[idx]["N"], self.goals[idx]["E"]
             self.OS_goal_old = self.OS_goals_old[idx]
+            self.TS_COLREGs_old = self.TS_COLREGs_all_old[idx]
             self._calculate_reward(a[idx])  # This uses the reward calculation from MMG_Env
             self.OS_goals_old[idx] = self.OS_goal_old
             rewards_agg[idx][0] = self.r

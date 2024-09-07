@@ -849,7 +849,7 @@ class MMG_Env(gym.Env):
 
                     # steer to the right in Head-on and starboard crossing situations在对头和右侧交叉下，本船的转向角度小于0(左转)，给惩罚
                     if self.TS_COLREGs_old[TS_idx] in [1, 2] and self.OS.nu[2] < 0.0:
-                        r_COLREG -= 100000.0
+                        r_COLREG -= 10.0
 
         # --------------------------------- 5. Comfort penalty --------------------------------
         if a == 0:

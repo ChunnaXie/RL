@@ -467,7 +467,7 @@ class TrajPlotter:
         #ax.set_yticklabels([nm for nm in range(15) if (nm + 1) % 2 == 1])
         ax.set_ylabel("Rudder angle [°]", fontsize=8)
 
-        # plot
+        # plot!
         ax.plot(self.step_to_minute(np.arange(len(self.OS_traj_rud_angle))), [rtd(ang) for ang in self.OS_traj_rud_angle], color="black", linewidth=0.75)
 
         ax.text(self.step_to_minute(100), 17.5, f"Case {sit}", fontdict={"fontsize" : 7})
