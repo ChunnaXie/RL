@@ -8,8 +8,8 @@ from tud_rl.envs._envs.MMG_Env import MMG_Env
 class MMG_Star(MMG_Env):
     """This environment contains four agents, each steering a KVLCC2."""
 
-    def __init__(self, N_TSs_max=3, state_design="RecDQN"):
-        super().__init__(N_TSs_max=N_TSs_max, state_design=state_design, pdf_traj=True, N_TSs_increasing=False, N_TSs_random=False)
+    def __init__(self, N_TSs_max=3, state_design="RecDQN", pdf_traj=True):
+        super().__init__(N_TSs_max=N_TSs_max, state_design=state_design, pdf_traj=pdf_traj, N_TSs_increasing=False, N_TSs_random=False)
         assert N_TSs_max in [3, 7, 15], "Consider either 4, 8, or 16 ships in total."
         self.N_TSs = self.N_TSs_max
 
@@ -274,6 +274,7 @@ class MMG_Star(MMG_Env):
     def _done(self):
         """Returns boolean flag whether episode is over."""
 
+        d = False
         # check goal reaching
         for idx, agent in enumerate(self.agents):
             
@@ -289,15 +290,20 @@ class MMG_Star(MMG_Env):
 
         # everyone reached goal
         if all(self.finished):
-            return True
-
-        if any([sublist[-1] >= 1.0 for sublist in self.state_agg]):
-            return True
-
+            d = True
+        elif any([sublist[-1] >= 1.0 for sublist in self.state_agg]):
+            d = True
         # artificial done signal
-        if self.step_cnt >= self._max_episode_steps:
-            return True
-        return False
+        elif self.step_cnt >= self._max_episode_steps:
+            d = True
+        else:
+            pass
+        if d and self.pdf_traj:
+            self.TrajPlotter.plot_traj_fnc(E_max=self.E_max, N_max=self.N_max, 
+                                           star=True,goals=self.goals,\
+                goal_reach_dist=self.goal_reach_dist, Lpp=self.agents[0].Lpp, step_cnt=self.step_cnt)
+            self.TrajPlotter.plot_rudder()!!
+        return d
 
 
     def render(self, mode=None):
