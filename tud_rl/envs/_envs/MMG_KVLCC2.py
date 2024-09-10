@@ -340,6 +340,7 @@ class KVLCC2:
             # inferred slope + intercept dependent on J (empirical)
             K_T = self.J_slo * J + self.J_int
 
+        #螺旋桨产生的推进力，t_P是推力减额系数，self.rho是水密度，K_T是螺旋桨推力系数，nps是是螺旋桨转速，D_p是螺旋桨直径
         X_P = (1 - t_P) * self.rho * K_T * nps**2 * self.D_p**4
 
         #--------------------- hydrodynamic forces by steering ----------------------
@@ -549,7 +550,14 @@ class KVLCC2:
 
     def _control(self, a):
         """
-        Action 'a' is an integer taking values in [0, 1, 2] for the discrete case. They correspond to:
+        舵角的调整
+        1、舵角增量设置：
+            self.rud_angle_max 定义了舵角的最大值，这通常是基于船舶的物理设计和安全操作限制。
+            self.rud_angle_inc 是舵角的增量，即每次调整改变的角度大小。
+        
+        2、舵角限制：无论增加还是减少舵角，最终的舵角都会通过 np.clip 方法限制在 -self.rud_angle_max 到 self.rud_angle_max 的范围内，以确保舵角不会超出物理或安全限制。
+        
+        3、Action 'a' is an integer taking values in [0, 1, 2] for the discrete case. They correspond to:
 
         0 - keep rudder angle as is
         1 - increase rudder angle

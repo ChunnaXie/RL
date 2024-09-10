@@ -833,7 +833,7 @@ class MMG_Env(gym.Env):
             # reward based on collision risk
             CR = self._get_CR(OS=self.OS, TS=TS)
             if CR == 1.0:
-                r_coll -= 1000.0
+                r_coll -= 100.0
             else:
                 if self.nonlinear_r_coll:
                     r_coll -= math.sqrt(CR)

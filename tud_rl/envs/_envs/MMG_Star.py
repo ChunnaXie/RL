@@ -302,7 +302,7 @@ class MMG_Star(MMG_Env):
             self.TrajPlotter.plot_traj_fnc(E_max=self.E_max, N_max=self.N_max, 
                                            star=True,goals=self.goals,\
                 goal_reach_dist=self.goal_reach_dist, Lpp=self.agents[0].Lpp, step_cnt=self.step_cnt)
-            self.TrajPlotter.plot_rudder()!!
+            #self.TrajPlotter.plot_rudder()
         return d
 
 

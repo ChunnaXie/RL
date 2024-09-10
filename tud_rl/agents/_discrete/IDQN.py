@@ -46,7 +46,7 @@ class IDQNAgent(BaseAgent):
 
                 self.DQNs  = []
                 for i in range(self.N_agents):
-                    c.dqn_weights = c.dqn_weights[:-13] + str(i) + c.dqn_weights[-12:]
+#                    c.dqn_weights = c.dqn_weights[:-13] + str(i) + c.dqn_weights[-12:]
                     self.DQNs.append(DQNAgent(c, agent_name))
                 self.n_params = self.DQNs[0].n_params * self.N_agents
                 

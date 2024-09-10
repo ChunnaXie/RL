@@ -88,7 +88,7 @@ critic_weights:
 lr_actor: 0.1
 lr_critic: 0.1
 tau: 0.01
-dqn_weights: D:\APP\Microsoft VS Code\Git\RL\experiments\IDQN_MMGStar-v0__2024-09-04_1020\IDQN_0_weights.pth
+dqn_weights: 
 gamma: 0.999
 eps_init: 1
 eps_final: 0.1
